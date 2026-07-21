@@ -3,79 +3,1035 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบส่งแผนการสอน</title>
+  <title>ระบบส่งแผนการจัดประสบการณ์การเรียนรู้ปฐมวัย - โรงเรียนอนุบาลเทศบาลเมืองบ้านพรุ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; background-color: #f9f9f9; }
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-    button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-    button:disabled { background-color: #ccc; }
-    #status { margin-top: 15px; font-weight: bold; text-align: center; }
+    body { font-family: 'Sarabun', sans-serif; }
+    .sidebar-link { transition: all 0.2s; }
+    .sidebar-link:hover, .sidebar-link.active { background-color: #1e40af; }
+    .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .tab-btn { transition: all 0.2s; }
+    .tab-btn.active { background-color: #1e40af; color: white; }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .countdown-segment { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .countdown-segment-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
   </style>
 </head>
-<body>
+<body class="bg-gray-50">
 
-  <h2>📋 ระบบส่งแผนการสอน</h2>
-  <form id="planForm">
-    <div class="form-group">
-      <label>ชื่อ-นามสกุล ผู้สอน:</label>
-      <input type="text" id="teacherName" required placeholder="เช่น ครูสมชาย ใจดี">
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-800">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
+      <div class="text-center mb-8">
+        <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-school text-3xl text-blue-600"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-800">ระบบส่งแผนจัดประสบการณ์</h1>
+        <p class="text-gray-500 mt-2">โรงเรียนอนุบาลเทศบาลเมืองบ้านพรุ</p>
+      </div>
+      <form id="loginForm" class="space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><i class="fas fa-user"></i></span>
+            <input type="text" id="loginUsername" required class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="กรอกชื่อผู้ใช้">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><i class="fas fa-lock"></i></span>
+            <input type="password" id="loginPassword" required class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" placeholder="กรอกรหัสผ่าน">
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors duration-200">
+          <i class="fas fa-sign-in-alt mr-2"></i>เข้าสู่ระบบ
+        </button>
+      </form>
     </div>
-    <div class="form-group">
-      <label>รหัสวิชา / ชื่อวิชา:</label>
-      <input type="text" id="subject" required placeholder="เช่น ว30101 วิทยาการคำนวณ">
-    </div>
-    <div class="form-group">
-      <label>ลิงก์แผนการสอน (Google Drive/PDF):</label>
-      <input type="url" id="planUrl" required placeholder="https://drive.google.com/...">
-    </div>
-    <button type="submit" id="submitBtn">ส่งแผนการสอน</button>
-  </form>
+  </div>
 
-  <div id="status"></div>
+  <!-- MAIN APP -->
+  <div id="mainApp" class="hidden min-h-screen">
+    <div class="flex">
+      <!-- SIDEBAR -->
+      <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-blue-900 text-white min-h-screen fixed left-0 top-0">
+        <div class="p-4 border-b border-blue-800">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-school text-blue-600"></i></div>
+            <div>
+              <h2 class="font-bold text-sm">ระบบส่งแผน</h2>
+              <p class="text-xs text-blue-200">อนุบาลบ้านพรุ</p>
+            </div>
+          </div>
+        </div>
+        <nav class="flex-1 p-3 space-y-1" id="sidebarMenu"></nav>
+        <div class="p-3 border-t border-blue-800">
+          <button onclick="logout()" class="w-full text-left px-3 py-2 rounded-lg text-red-300 hover:bg-red-900/30 transition-colors"><i class="fas fa-sign-out-alt mr-2"></i>ออกจากระบบ</button>
+        </div>
+      </aside>
 
+      <!-- MOBILE TOPBAR -->
+      <div class="md:hidden fixed top-0 left-0 right-0 bg-blue-900 text-white z-50 flex items-center justify-between px-4 py-3">
+        <button onclick="toggleMobileMenu()" class="text-xl"><i class="fas fa-bars"></i></button>
+        <span class="font-semibold text-sm">ระบบส่งแผน</span>
+        <button onclick="logout()" class="text-red-300"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+
+      <!-- MOBILE SIDEBAR -->
+      <div id="mobileSidebar" class="hidden fixed inset-0 z-50 bg-black/50" onclick="toggleMobileMenu()">
+        <div class="w-64 bg-blue-900 text-white min-h-screen p-4" onclick="event.stopPropagation()">
+          <nav class="space-y-1 mt-4" id="mobileSidebarMenu"></nav>
+          <button onclick="logout()" class="w-full text-left px-3 py-2 mt-4 rounded-lg text-red-300 hover:bg-red-900/30"><i class="fas fa-sign-out-alt mr-2"></i>ออกจากระบบ</button>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <main class="flex-1 md:ml-64 min-h-screen">
+        <header class="bg-white shadow-sm sticky top-0 z-30 px-4 md:px-8 py-4 flex items-center justify-between mt-12 md:mt-0">
+          <div>
+            <h1 id="pageTitle" class="text-xl font-bold text-gray-800">Dashboard</h1>
+            <p id="pageSubtitle" class="text-sm text-gray-500">ภาพรวมระบบ</p>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="text-right hidden sm:block">
+              <p id="userDisplayName" class="font-semibold text-gray-800 text-sm">-</p>
+              <p id="userRole" class="text-xs text-gray-500">-</p>
+            </div>
+            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff" class="w-10 h-10 rounded-full object-cover border-2 border-blue-100" alt="">
+          </div>
+        </header>
+
+        <div class="p-4 md:p-8">
+
+          <!-- ADMIN SECTION -->
+          <section id="adminSection" class="hidden space-y-6 fade-in">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <h2 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-calendar-alt text-blue-600 mr-2"></i>จัดการปีการศึกษา</h2>
+              <div class="flex items-center gap-4">
+                <input type="text" id="academicYearInput" class="border border-gray-300 rounded-lg px-4 py-2 w-40 text-center text-lg font-semibold focus:ring-2 focus:ring-blue-500 outline-none">
+                <button onclick="updateAcademicYear()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"><i class="fas fa-save mr-2"></i>บันทึก</button>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-chalkboard text-blue-600 mr-2"></i>จัดการห้องเรียน</h2>
+                <button onclick="showAddClassroomModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"><i class="fas fa-plus mr-1"></i>เพิ่มห้อง</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead><tr class="bg-gray-50 text-gray-600">
+                    <th class="px-4 py-3 text-left rounded-tl-lg">รหัส</th>
+                    <th class="px-4 py-3 text-left">ชื่อห้องเรียน</th>
+                    <th class="px-4 py-3 text-center rounded-tr-lg">จัดการ</th>
+                  </tr></thead>
+                  <tbody id="classroomsTable" class="divide-y divide-gray-100"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-users text-blue-600 mr-2"></i>จัดการผู้ใช้งาน (ครู)</h2>
+                <button onclick="showAddTeacherModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"><i class="fas fa-plus mr-1"></i>เพิ่มครู</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead><tr class="bg-gray-50 text-gray-600">
+                    <th class="px-4 py-3 text-left rounded-tl-lg">รหัส</th>
+                    <th class="px-4 py-3 text-left">ชื่อ-นามสกุล</th>
+                    <th class="px-4 py-3 text-left">ห้องเรียน</th>
+                    <th class="px-4 py-3 text-center">Username</th>
+                    <th class="px-4 py-3 text-center rounded-tr-lg">จัดการ</th>
+                  </tr></thead>
+                  <tbody id="teachersTable" class="divide-y divide-gray-100"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <h2 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-user-tie text-blue-600 mr-2"></i>จัดการผู้อำนวยการ</h2>
+              <form id="directorForm" onsubmit="saveDirector(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">คำนำหน้า</label>
+                  <select id="dirPrefix" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="นาย">นาย</option><option value="นาง">นาง</option><option value="นางสาว">นางสาว</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ</label>
+                  <input type="text" id="dirFirstname" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">นามสกุล</label>
+                  <input type="text" id="dirLastname" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                  <input type="text" id="dirUsername" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
+                  <input type="password" id="dirPassword" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="เว้นว่างถ้าไม่เปลี่ยน">
+                </div>
+                <div class="md:col-span-2">
+                  <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"><i class="fas fa-save mr-2"></i>บันทึกข้อมูลผอ.</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- DIRECTOR SECTION -->
+          <section id="directorSection" class="hidden space-y-6 fade-in">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="bg-white rounded-xl shadow-sm p-6 card-hover border-l-4 border-yellow-400">
+                <div class="flex items-center justify-between">
+                  <div><p class="text-sm text-gray-500">รออนุมัติ</p><p id="dashPending" class="text-3xl font-bold text-yellow-600">0</p></div>
+                  <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center"><i class="fas fa-clock text-yellow-600 text-xl"></i></div>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl shadow-sm p-6 card-hover border-l-4 border-green-400">
+                <div class="flex items-center justify-between">
+                  <div><p class="text-sm text-gray-500">อนุมัติแล้ว</p><p id="dashApproved" class="text-3xl font-bold text-green-600">0</p></div>
+                  <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-check-circle text-green-600 text-xl"></i></div>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl shadow-sm p-6 card-hover border-l-4 border-red-400">
+                <div class="flex items-center justify-between">
+                  <div><p class="text-sm text-gray-500">ส่งคืนแก้ไข</p><p id="dashRejected" class="text-3xl font-bold text-red-600">0</p></div>
+                  <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center"><i class="fas fa-undo text-red-600 text-xl"></i></div>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl shadow-sm p-6 card-hover border-l-4 border-blue-400">
+                <div class="flex items-center justify-between">
+                  <div><p class="text-sm text-gray-500">ส่งแผนสัปดาห์นี้</p><p id="dashWeekly" class="text-3xl font-bold text-blue-600">0</p></div>
+                  <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-users text-blue-600 text-xl"></i></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm">
+              <div class="flex border-b border-gray-200">
+                <button onclick="switchDirectorTab('pending')" id="tabPending" class="tab-btn active flex-1 py-4 text-center font-semibold"><i class="fas fa-clock mr-2"></i>รออนุมัติ</button>
+                <button onclick="switchDirectorTab('approved')" id="tabApproved" class="tab-btn flex-1 py-4 text-center font-semibold text-gray-600"><i class="fas fa-check mr-2"></i>อนุมัติแล้ว</button>
+              </div>
+              <div class="p-6">
+                <div id="pendingPlansList" class="space-y-4"></div>
+                <div id="approvedPlansList" class="hidden space-y-4"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- TEACHER SECTION -->
+          <section id="teacherSection" class="hidden space-y-6 fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="countdown-segment rounded-xl p-6 text-white">
+                <h3 class="text-lg font-semibold mb-1"><i class="fas fa-paper-plane mr-2"></i>ส่งแผนการสอนล่วงหน้า</h3>
+                <p class="text-blue-100 text-sm mb-3">กำหนดส่งก่อนเที่ยงคืนวันอาทิตย์</p>
+                <div id="planCountdown" class="text-3xl font-bold">--:--:--</div>
+              </div>
+              <div class="countdown-segment-2 rounded-xl p-6 text-white">
+                <h3 class="text-lg font-semibold mb-1"><i class="fas fa-tasks mr-2"></i>ส่งหลังแผนการสอน</h3>
+                <p class="text-pink-100 text-sm mb-3">กำหนดส่งก่อนเที่ยงคืนวันเสาร์</p>
+                <div id="postPlanCountdown" class="text-3xl font-bold">--:--:--</div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <h2 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-file-upload text-blue-600 mr-2"></i>ส่งแผนการสอน</h2>
+              <form id="submitPlanForm" onsubmit="submitPlan(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">สาระการเรียนรู้</label>
+                  <input type="text" id="planLearningArea" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="เช่น ภาษาไทย">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อหน่วยการเรียนรู้</label>
+                  <input type="text" id="planUnitName" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="เช่น หน่วยที่ 1">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">สาระการเรียนรู้ย่อย</label>
+                  <input type="text" id="planSubUnitName" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="เช่น สาระย่อยที่ 1">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">ลิงก์ไฟล์แผน (Google Drive)</label>
+                  <input type="url" id="planUrl" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://drive.google.com/file/d/...">
+                </div>
+                <div class="md:col-span-2">
+                  <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"><i class="fas fa-paper-plane mr-2"></i>ส่งแผนการสอน</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <h2 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-clipboard-check text-pink-600 mr-2"></i>ส่งหลังแผนการสอน</h2>
+              <form id="submitPostPlanForm" onsubmit="submitPostPlan(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">เลือกแผนที่อนุมัติแล้ว</label>
+                  <select id="postPlanSelect" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none">
+                    <option value="">-- กรุณาเลือกแผน --</option>
+                  </select>
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">ลิงก์ไฟล์หลังแผน (Google Drive)</label>
+                  <input type="url" id="postPlanUrl" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 outline-none" placeholder="https://drive.google.com/file/d/...">
+                </div>
+                <div class="md:col-span-2">
+                  <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"><i class="fas fa-upload mr-2"></i>ส่งหลังแผน</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-list-alt text-blue-600 mr-2"></i>แผนของฉัน</h2>
+                <button onclick="loadMyPlans()" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-sync-alt mr-1"></i>รีเฟรช</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead><tr class="bg-gray-50 text-gray-600">
+                    <th class="px-4 py-3 text-left rounded-tl-lg">หน่วยการเรียนรู้</th>
+                    <th class="px-4 py-3 text-left">สาระการเรียนรู้</th>
+                    <th class="px-4 py-3 text-center">สถานะ</th>
+                    <th class="px-4 py-3 text-left">ความคิดเห็นผอ.</th>
+                    <th class="px-4 py-3 text-center rounded-tr-lg">จัดการ</th>
+                  </tr></thead>
+                  <tbody id="myPlansTable" class="divide-y divide-gray-100"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- PROFILE SECTION -->
+          <section id="profileSection" class="hidden space-y-6 fade-in">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <h2 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-user-edit text-blue-600 mr-2"></i>แก้ไขข้อมูลส่วนตัว</h2>
+              <form id="profileForm" onsubmit="updateProfile(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">คำนำหน้า</label>
+                  <select id="profPrefix" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="นาย">นาย</option><option value="นาง">นาง</option><option value="นางสาว">นางสาว</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ</label>
+                  <input type="text" id="profFirstname" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">นามสกุล</label>
+                  <input type="text" id="profLastname" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่านใหม่</label>
+                  <input type="password" id="profPassword" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="เว้นว่างถ้าไม่เปลี่ยน">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">รูปโปรไฟล์</label>
+                  <input type="file" id="profPic" accept="image/*" onchange="previewProfilePic(event)" class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                  <img id="profPicPreview" class="mt-3 w-24 h-24 rounded-full object-cover border-2 border-gray-200 hidden" alt="">
+                </div>
+                <div class="md:col-span-2">
+                  <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"><i class="fas fa-save mr-2"></i>บันทึก</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODALS -->
+  <div id="classroomModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+      <h3 id="classroomModalTitle" class="text-lg font-bold text-gray-800 mb-4">เพิ่มห้องเรียน</h3>
+      <form onsubmit="saveClassroom(event)">
+        <input type="hidden" id="classroomEditId">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อห้องเรียน</label>
+          <input type="text" id="classroomName" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="เช่น อ.1/1">
+        </div>
+        <div class="flex gap-3 justify-end">
+          <button type="button" onclick="closeModal('classroomModal')" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">ยกเลิก</button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="teacherModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4">
+      <h3 class="text-lg font-bold text-gray-800 mb-4">เพิ่มครูผู้สอน</h3>
+      <form onsubmit="saveTeacher(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">คำนำหน้า</label>
+          <select id="teacherPrefix" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="นาย">นาย</option><option value="นาง">นาง</option><option value="นางสาว">นางสาว</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ</label>
+          <input type="text" id="teacherFirstname" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">นามสกุล</label>
+          <input type="text" id="teacherLastname" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">ห้องเรียนประจำชั้น</label>
+          <select id="teacherClassroom" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="">เลือกห้องเรียน</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <input type="text" id="teacherUsername" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input type="text" id="teacherPassword" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div class="md:col-span-2 flex gap-3 justify-end">
+          <button type="button" onclick="closeModal('teacherModal')" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">ยกเลิก</button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="resubmitModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4">
+      <h3 class="text-lg font-bold text-gray-800 mb-4">ส่งแผนที่แก้ไขใหม่</h3>
+      <form onsubmit="submitResubmit(event)" class="space-y-4">
+        <input type="hidden" id="resubmitPlanId">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อหน่วยการเรียนรู้</label>
+          <input type="text" id="resubmitUnitName" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">ลิงก์ไฟล์แผนใหม่ (Google Drive)</label>
+          <input type="url" id="resubmitPlanUrl" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://drive.google.com/file/d/...">
+        </div>
   <script>
-    // 🔗 ***นำ Web App URL จาก Google Apps Script ใน Step 1 มาวางตรงนี้ครับ***
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQKMtq1Z69ZSAOc-C5mvfgpPnQEeIym4lrG8a03yEDg4svqAicURRc8yUuP5BGYrkj/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyauEnWVa_eIup8YA4TvB-xeKQdwHlKfyhQD8vSntIgrXhmnGLRzeb1O7frlc8-vAJU/exec';
+    let currentUser = null;
+    let countdownInterval = null;
+    let deadlineData = null;
+    let editingClassroomId = null;
 
-    const form = document.getElementById('planForm');
-    const statusDiv = document.getElementById('status');
-    const submitBtn = document.getElementById('submitBtn');
+    document.addEventListener('DOMContentLoaded', function() {
+      const saved = localStorage.getItem('kps_user');
+      if (saved) {
+        try {
+          currentUser = JSON.parse(saved);
+          showMainApp();
+        } catch (e) {
+          localStorage.removeItem('kps_user');
+        }
+      }
+    });
 
-    form.addEventListener('submit', function(e) {
+    async function apiCall(action, payload) {
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(Object.assign({ action: action }, payload))
+        });
+        return await res.json();
+      } catch (err) {
+        return { success: false, message: err.toString() };
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      
-      submitBtn.disabled = true;
-      statusDiv.style.color = 'blue';
-      statusDiv.innerText = 'กำลังส่งข้อมูล... กรุณารอสักครู่';
-
-      const payload = {
-        teacherName: document.getElementById('teacherName').value,
-        subject: document.getElementById('subject').value,
-        planUrl: document.getElementById('planUrl').value
-      };
-
-      // ส่งข้อมูลไปหา Google Apps Script
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors', // สำคัญมาก เพื่อหลีกเลี่ยงปัญหา CORS กับ Apps Script
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(() => {
-        statusDiv.style.color = 'green';
-        statusDiv.innerText = '✅ ส่งแผนการสอนเรียบร้อยแล้ว!';
-        form.reset();
-        submitBtn.disabled = false;
-      })
-      .catch(error => {
-        statusDiv.style.color = 'red';
-        statusDiv.innerText = '❌ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
-        console.error('Error:', error);
-        submitBtn.disabled = false;
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+      Swal.fire({ title: 'กำลังเข้าสู่ระบบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      apiCall('login', { username, password }).then(res => {
+        if (res.success) {
+          currentUser = res.data.user;
+          currentUser.role = res.data.role;
+          localStorage.setItem('kps_user', JSON.stringify(currentUser));
+          Swal.fire({ icon: 'success', title: 'เข้าสู่ระบบสำเร็จ', timer: 1000, showConfirmButton: false }).then(() => showMainApp());
+        } else {
+          Swal.fire({ icon: 'error', title: 'เข้าสู่ระบบไม่สำเร็จ', text: res.message });
+        }
       });
     });
+
+    function logout() {
+      Swal.fire({
+        title: 'ออกจากระบบ?', text: 'คุณต้องการออกจากระบบหรือไม่?',
+        icon: 'question', showCancelButton: true,
+        confirmButtonText: 'ออกจากระบบ', cancelButtonText: 'ยกเลิก'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          currentUser = null;
+          localStorage.removeItem('kps_user');
+          if (countdownInterval) clearInterval(countdownInterval);
+          document.getElementById('mainApp').classList.add('hidden');
+          document.getElementById('loginPage').classList.remove('hidden');
+          document.getElementById('loginUsername').value = '';
+          document.getElementById('loginPassword').value = '';
+        }
+      });
+    }
+
+    function showMainApp() {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      const role = currentUser.role;
+      const name = (currentUser.prefix || '') + (currentUser.firstname || '') + ' ' + (currentUser.lastname || '');
+      document.getElementById('userDisplayName').textContent = name;
+      const roleLabels = { admin: 'ผู้ดูแลระบบ', director: 'ผู้อำนวยการ', teacher: 'ครูผู้สอน' };
+      document.getElementById('userRole').textContent = roleLabels[role] || role;
+      if (currentUser.profilePicUrl) document.getElementById('userAvatar').src = currentUser.profilePicUrl;
+
+      const menuItems = [
+        { id: 'profile', icon: 'fa-user', label: 'ข้อมูลส่วนตัว', roles: ['admin','director','teacher'] }
+      ];
+      if (role === 'admin') menuItems.push({ id: 'admin', icon: 'fa-cog', label: 'จัดการระบบ', roles: ['admin'] });
+      if (role === 'director') menuItems.push({ id: 'director', icon: 'fa-chart-line', label: 'Dashboard ผอ.', roles: ['director'] });
+      if (role === 'teacher') menuItems.push({ id: 'teacher', icon: 'fa-chalkboard-teacher', label: 'เมนูครูผู้สอน', roles: ['teacher'] });
+
+      const sidebarMenu = document.getElementById('sidebarMenu');
+      const mobileMenu = document.getElementById('mobileSidebarMenu');
+      sidebarMenu.innerHTML = '';
+      mobileMenu.innerHTML = '';
+      menuItems.forEach(item => {
+        if (item.roles.includes(role)) {
+          const link = '<a href="javascript:void(0)" onclick="showSection(\'' + item.id + '\')" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm" data-section="' + item.id + '"><i class="fas ' + item.icon + ' w-5"></i>' + item.label + '</a>';
+          sidebarMenu.innerHTML += link;
+          mobileMenu.innerHTML += '<a href="javascript:void(0)" onclick="showSection(\'' + item.id + '\'); toggleMobileMenu()" class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm" data-section="' + item.id + '"><i class="fas ' + item.icon + ' w-5"></i>' + item.label + '</a>';
+        }
+      });
+
+      if (role === 'admin') showSection('admin');
+      else if (role === 'director') showSection('director');
+      else showSection('teacher');
+    }
+
+    function showSection(sectionId) {
+      document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('[data-section="' + sectionId + '"]').forEach(el => el.classList.add('active'));
+      document.getElementById('adminSection').classList.add('hidden');
+      document.getElementById('directorSection').classList.add('hidden');
+      document.getElementById('teacherSection').classList.add('hidden');
+      document.getElementById('profileSection').classList.add('hidden');
+
+      if (sectionId === 'admin') {
+        document.getElementById('adminSection').classList.remove('hidden');
+        document.getElementById('pageTitle').textContent = 'จัดการระบบ';
+        document.getElementById('pageSubtitle').textContent = 'จัดการปีการศึกษา ห้องเรียน และผู้ใช้งาน';
+        loadAcademicYear(); loadClassrooms(); loadTeachers(); loadDirectorInfo();
+      } else if (sectionId === 'director') {
+        document.getElementById('directorSection').classList.remove('hidden');
+        document.getElementById('pageTitle').textContent = 'Dashboard ผู้อำนวยการ';
+        document.getElementById('pageSubtitle').textContent = 'ติดตามและอนุมัติแผนการสอน';
+        loadDirectorDashboard(); loadPendingPlans(); loadApprovedPlansDirector();
+      } else if (sectionId === 'teacher') {
+        document.getElementById('teacherSection').classList.remove('hidden');
+        document.getElementById('pageTitle').textContent = 'เมนูครูผู้สอน';
+        document.getElementById('pageSubtitle').textContent = 'ส่งแผนและหลังแผน';
+        startCountdown(); loadApprovedPlansForDropdown(); loadMyPlans();
+      } else if (sectionId === 'profile') {
+        document.getElementById('profileSection').classList.remove('hidden');
+        document.getElementById('pageTitle').textContent = 'ข้อมูลส่วนตัว';
+        document.getElementById('pageSubtitle').textContent = 'แก้ไขข้อมูลส่วนตัวและรหัสผ่าน';
+        loadProfile();
+      }
+    }
+
+    function toggleMobileMenu() {
+      document.getElementById('mobileSidebar').classList.toggle('hidden');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr;
+      return d.toLocaleString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    async function loadAcademicYear() {
+      const res = await apiCall('getAcademicYear', {});
+      if (res.success) document.getElementById('academicYearInput').value = res.data.academicYear;
+    }
+
+    async function updateAcademicYear() {
+      const year = document.getElementById('academicYearInput').value;
+      const res = await apiCall('setAcademicYear', { year });
+      if (res.success) Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', timer: 1500, showConfirmButton: false });
+      else Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+    }
+
+    async function loadClassrooms() {
+      const res = await apiCall('getClassrooms', {});
+      const tbody = document.getElementById('classroomsTable');
+      if (res.success && res.data.classrooms.length) {
+        tbody.innerHTML = res.data.classrooms.map(c => '<tr><td class="px-4 py-3 font-mono text-gray-600">' + c.classId + '</td><td class="px-4 py-3 font-medium">' + c.className + '</td><td class="px-4 py-3 text-center"><button onclick="showEditClassroomModal(\'' + c.classId + '\',\'' + c.className + '\')" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button><button onclick="deleteClassroomConfirm(\'' + c.classId + '\',\'' + c.className + '\')" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button></td></tr>').join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-6 text-center text-gray-400">ยังไม่มีห้องเรียน</td></tr>';
+      }
+    }
+
+    function showAddClassroomModal() {
+      editingClassroomId = null;
+      document.getElementById('classroomModalTitle').textContent = 'เพิ่มห้องเรียน';
+      document.getElementById('classroomEditId').value = '';
+      document.getElementById('classroomName').value = '';
+      document.getElementById('classroomModal').classList.remove('hidden');
+    }
+
+    function showEditClassroomModal(classId, className) {
+      editingClassroomId = classId;
+      document.getElementById('classroomModalTitle').textContent = 'แก้ไขห้องเรียน';
+      document.getElementById('classroomEditId').value = classId;
+      document.getElementById('classroomName').value = className;
+      document.getElementById('classroomModal').classList.remove('hidden');
+    }
+
+    async function saveClassroom(e) {
+      e.preventDefault();
+      const name = document.getElementById('classroomName').value;
+      const id = document.getElementById('classroomEditId').value;
+      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      let res;
+      if (id) res = await apiCall('updateClassroom', { classId: id, className: name });
+      else res = await apiCall('addClassroom', { className: name });
+      if (res.success) {
+        closeModal('classroomModal');
+        Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', timer: 1500, showConfirmButton: false });
+        loadClassrooms();
+      } else {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+      }
+    }
+
+    function deleteClassroomConfirm(classId, className) {
+      Swal.fire({
+        title: 'ลบห้องเรียน?', text: 'ต้องการลบห้อง ' + className + ' หรือไม่?',
+        icon: 'warning', showCancelButton: true,
+        confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#dc2626'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const res = await apiCall('deleteClassroom', { classId });
+          if (res.success) { Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', timer: 1500, showConfirmButton: false }); loadClassrooms(); }
+          else Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+        }
+      });
+    }
+
+    async function loadTeachers() {
+      const res = await apiCall('getUsers', {});
+      const tbody = document.getElementById('teachersTable');
+      const classrooms = await apiCall('getClassrooms', {});
+      const classroomMap = {};
+      if (classrooms.success) classrooms.data.classrooms.forEach(c => classroomMap[c.classId] = c.className);
+      if (res.success && res.data.users.length) {
+        const teachers = res.data.users.filter(u => u.role === 'teacher');
+        if (teachers.length) {
+          tbody.innerHTML = teachers.map(t => '<tr><td class="px-4 py-3 font-mono text-gray-600">' + t.userId + '</td><td class="px-4 py-3 font-medium">' + t.prefix + (t.firstname || '') + ' ' + (t.lastname || '') + '</td><td class="px-4 py-3">' + (t.classRoom || '-') + '</td><td class="px-4 py-3 text-center">' + t.username + '</td><td class="px-4 py-3 text-center"><button onclick="resetPasswordConfirm(\'' + t.userId + '\',\'' + t.username + '\')" class="text-yellow-600 hover:text-yellow-800 mr-2" title="รีเซ็ตรหัสผ่าน"><i class="fas fa-key"></i></button><button onclick="deleteTeacherConfirm(\'' + t.userId + '\',\'' + t.firstname + '\')" class="text-red-600 hover:text-red-800" title="ลบ"><i class="fas fa-trash"></i></button></td></tr>').join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-gray-400">ยังไม่มีครูในระบบ</td></tr>';
+        }
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-gray-400">ยังไม่มีครูในระบบ</td></tr>';
+      }
+    }
+
+    async function showAddTeacherModal() {
+      document.getElementById('teacherPrefix').value = 'นาย';
+      document.getElementById('teacherFirstname').value = '';
+      document.getElementById('teacherLastname').value = '';
+      document.getElementById('teacherUsername').value = '';
+      document.getElementById('teacherPassword').value = '';
+      const select = document.getElementById('teacherClassroom');
+      select.innerHTML = '<option value="">เลือกห้องเรียน</option>';
+      const res = await apiCall('getClassrooms', {});
+      if (res.success) {
+        res.data.classrooms.forEach(c => {
+          select.innerHTML += '<option value="' + c.className + '">' + c.className + '</option>';
+        });
+      }
+      document.getElementById('teacherModal').classList.remove('hidden');
+    }
+
+    async function saveTeacher(e) {
+      e.preventDefault();
+      const data = {
+        prefix: document.getElementById('teacherPrefix').value,
+        firstname: document.getElementById('teacherFirstname').value,
+        lastname: document.getElementById('teacherLastname').value,
+        classRoom: document.getElementById('teacherClassroom').value,
+        username: document.getElementById('teacherUsername').value,
+        password: document.getElementById('teacherPassword').value
+      };
+      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      const res = await apiCall('addTeacher', data);
+      if (res.success) {
+        closeModal('teacherModal');
+        Swal.fire({ icon: 'success', title: 'เพิ่มครูสำเร็จ', timer: 1500, showConfirmButton: false });
+        loadTeachers();
+      } else {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+      }
+    }
+
+    function resetPasswordConfirm(userId, username) {
+      Swal.fire({
+        title: 'รีเซ็ตรหัสผ่าน', text: 'ตั้งรหัสผ่านใหม่สำหรับ ' + username,
+        input: 'text', inputLabel: 'รหัสผ่านใหม่', inputValue: '123456',
+        showCancelButton: true, confirmButtonText: 'ตกลง', cancelButtonText: 'ยกเลิก',
+        inputValidator: (val) => { if (!val) return 'กรุณากรอกรหัสผ่าน'; }
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const res = await apiCall('resetPassword', { userId, newPassword: result.value });
+          if (res.success) Swal.fire({ icon: 'success', title: 'รีเซ็ตรหัสผ่านสำเร็จ', timer: 1500, showConfirmButton: false });
+          else Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+        }
+      });
+    }
+
+    function deleteTeacherConfirm(userId, firstname) {
+      Swal.fire({
+        title: 'ลบครู?', text: 'ต้องการลบครู ' + firstname + ' หรือไม่?',
+        icon: 'warning', showCancelButton: true,
+        confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#dc2626'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const res = await apiCall('deleteTeacher', { userId });
+          if (res.success) { Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', timer: 1500, showConfirmButton: false }); loadTeachers(); }
+          else Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+        }
+      });
+    }
+
+    async function loadDirectorInfo() {
+      const res = await apiCall('getUsers', {});
+      if (res.success) {
+        const director = res.data.users.find(u => u.role === 'director');
+        if (director) {
+          document.getElementById('dirPrefix').value = director.prefix || 'นาย';
+          document.getElementById('dirFirstname').value = director.firstname || '';
+          document.getElementById('dirLastname').value = director.lastname || '';
+          document.getElementById('dirUsername').value = director.username || '';
+          document.getElementById('dirPassword').value = '';
+        }
+      }
+    }
+
+    async function saveDirector(e) {
+      e.preventDefault();
+      const data = {
+        prefix: document.getElementById('dirPrefix').value,
+        firstname: document.getElementById('dirFirstname').value,
+        lastname: document.getElementById('dirLastname').value,
+        username: document.getElementById('dirUsername').value
+      };
+      const pw = document.getElementById('dirPassword').value;
+      if (pw) data.password = pw;
+      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      const res = await apiCall('manageDirector', data);
+      if (res.success) Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', timer: 1500, showConfirmButton: false });
+      else Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+    }
+
+    async function loadDirectorDashboard() {
+      const res = await apiCall('getDirectorDashboardSummary', {});
+      if (res.success) {
+        document.getElementById('dashPending').textContent = res.data.pending;
+        document.getElementById('dashApproved').textContent = res.data.approved;
+        document.getElementById('dashRejected').textContent = res.data.rejected;
+        document.getElementById('dashWeekly').textContent = res.data.weeklySubmissions;
+      }
+    }
+
+    function switchDirectorTab(tab) {
+      if (tab === 'pending') {
+        document.getElementById('tabPending').classList.add('active');
+        document.getElementById('tabApproved').classList.remove('active');
+        document.getElementById('tabApproved').classList.add('text-gray-600');
+        document.getElementById('tabPending').classList.remove('text-gray-600');
+        document.getElementById('pendingPlansList').classList.remove('hidden');
+        document.getElementById('approvedPlansList').classList.add('hidden');
+      } else {
+        document.getElementById('tabApproved').classList.add('active');
+        document.getElementById('tabPending').classList.remove('active');
+        document.getElementById('tabPending').classList.add('text-gray-600');
+        document.getElementById('tabApproved').classList.remove('text-gray-600');
+        document.getElementById('approvedPlansList').classList.remove('hidden');
+        document.getElementById('pendingPlansList').classList.add('hidden');
+      }
+    }
+
+    async function loadPendingPlans() {
+      const res = await apiCall('getPendingPlans', {});
+      const container = document.getElementById('pendingPlansList');
+      if (res.success && res.data.plans.length) {
+        container.innerHTML = res.data.plans.map(p => '<div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"><div class="flex flex-col md:flex-row md:items-center justify-between gap-3"><div class="flex-1"><div class="flex items-center gap-2 mb-2"><span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full font-medium">รออนุมัติ</span><span class="text-xs text-gray-400">' + formatDate(p.submittedAt) + '</span></div><h3 class="font-bold text-gray-800">' + p.unitName + ' - ' + p.subUnitName + '</h3><p class="text-sm text-gray-600 mt-1"><i class="fas fa-user mr-1"></i>' + p.teacherName + ' | <i class="fas fa-chalkboard mr-1"></i>' + p.classRoom + ' | <i class="fas fa-book mr-1"></i>' + p.learningArea + '</p><a href="' + p.planUrl + '" target="_blank" class="inline-flex items-center mt-2 text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-file-pdf mr-1"></i>เปิดดูแผน PDF</a></div><div class="flex flex-col gap-2 md:w-64"><input type="text" id="comment_' + p.planId + '" placeholder="ความคิดเห็น/ข้อเสนอแนะ" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"><div class="flex gap-2"><button onclick="approvePlanAction(\'' + p.planId + '\')" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm transition-colors"><i class="fas fa-check mr-1"></i>อนุมัติ</button><button onclick="rejectPlanAction(\'' + p.planId + '\')" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-sm transition-colors"><i class="fas fa-undo mr-1"></i>ส่งคืน</button></div></div></div></div>').join('');
+      } else {
+        container.innerHTML = '<div class="text-center py-8 text-gray-400"><i class="fas fa-inbox text-4xl mb-3"></i><p>ไม่มีแผนรออนุมัติ</p></div>';
+      }
+    }
+
+    async function loadApprovedPlansDirector() {
+      const res = await apiCall('getApprovedPlans', {});
+      const container = document.getElementById('approvedPlansList');
+      if (res.success && res.data.plans.length) {
+        container.innerHTML = res.data.plans.map(p => '<div class="border border-gray-200 rounded-lg p-4"><div class="flex items-center gap-2 mb-2"><span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium">อนุมัติแล้ว</span><span class="text-xs text-gray-400">' + formatDate(p.updatedAt) + '</span></div><h3 class="font-bold text-gray-800">' + p.unitName + ' - ' + p.subUnitName + '</h3><p class="text-sm text-gray-600 mt-1"><i class="fas fa-user mr-1"></i>' + p.teacherName + ' | <i class="fas fa-chalkboard mr-1"></i>' + p.classRoom + ' | <i class="fas fa-book mr-1"></i>' + p.learningArea + '</p>' + (p.directorComment ? '<p class="text-sm text-gray-500 mt-2 bg-gray-50 p-2 rounded"><i class="fas fa-comment mr-1"></i>' + p.directorComment + '</p>' : '') + '<a href="' + p.planUrl + '" target="_blank" class="inline-flex items-center mt-2 text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-file-pdf mr-1"></i>เปิดดูแผน PDF</a></div>').join('');
+      } else {
+        container.innerHTML = '<div class="text-center py-8 text-gray-400"><i class="fas fa-check-circle text-4xl mb-3"></i><p>ยังไม่มีแผนที่อนุมัติ</p></div>';
+      }
+    }
+
+    function approvePlanAction(planId) {
+      const comment = document.getElementById('comment_' + planId).value;
+      Swal.fire({
+        title: 'อนุมัติแผนนี้?', text: 'แผนจะถูกอนุมัติและแจ้งครู',
+        icon: 'question', showCancelButton: true,
+        confirmButtonText: 'อนุมัติ', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#16a34a'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+          const res = await apiCall('approvePlan', { planId, directorComment: comment });
+          if (res.success) {
+            Swal.fire({ icon: 'success', title: 'อนุมัติสำเร็จ', timer: 1500, showConfirmButton: false });
+            loadDirectorDashboard(); loadPendingPlans();
+          } else Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+        }
+      });
+    }
+
+    function rejectPlanAction(planId) {
+      const comment = document.getElementById('comment_' + planId).value;
+      Swal.fire({
+        title: 'ส่งคืนแผนนี้?', text: 'ต้องการส่งคืนให้ครูแก้ไขหรือไม่?',
+        input: 'textarea', inputValue: comment, inputLabel: 'เหตุผลที่ส่งคืน',
+        icon: 'warning', showCancelButton: true,
+        confirmButtonText: 'ส่งคืน', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#dc2626',
+        inputValidator: (val) => { if (!val) return 'กรุณาระบุเหตุผลที่ส่งคืน'; }
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+          const res = await apiCall('rejectPlan', { planId, directorComment: result.value });
+          if (res.success) {
+            Swal.fire({ icon: 'success', title: 'ส่งคืนสำเร็จ', timer: 1500, showConfirmButton: false });
+            loadDirectorDashboard(); loadPendingPlans();
+          } else Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+        }
+      });
+    }
+
+    async function startCountdown() {
+      if (countdownInterval) clearInterval(countdownInterval);
+      const res = await apiCall('getSubmissionDeadlines', {});
+      if (res.success) {
+        deadlineData = res.data;
+        updateCountdownDisplay();
+        countdownInterval = setInterval(updateCountdownDisplay, 1000);
+      }
+    }
+
+    function updateCountdownDisplay() {
+      if (!deadlineData) return;
+      const now = Date.now();
+      document.getElementById('planCountdown').textContent = msToCountdown(Math.max(0, deadlineData.planRemaining));
+      document.getElementById('postPlanCountdown').textContent = msToCountdown(Math.max(0, deadlineData.postPlanRemaining));
+      deadlineData.planRemaining -= 1000;
+      deadlineData.postPlanRemaining -= 1000;
+    }
+
+    function msToCountdown(ms) {
+      const totalSec = Math.floor(ms / 1000);
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = totalSec % 60;
+      return days + 'วัน ' + String(hours).padStart(2,'0') + ':' + String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+    }
+
+    async function submitPlan(e) {
+      e.preventDefault();
+      const data = {
+        teacherId: currentUser.userId,
+        learningArea: document.getElementById('planLearningArea').value,
+        unitName: document.getElementById('planUnitName').value,
+        subUnitName: document.getElementById('planSubUnitName').value,
+        planUrl: document.getElementById('planUrl').value
+      };
+      Swal.fire({ title: 'กำลังส่งแผน...', text: 'กรุณารอสักครู่ ระบบกำลังคัดลอกไฟล์', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      const res = await apiCall('submitPlan', data);
+      if (res.success) {
+        Swal.fire({ icon: 'success', title: 'ส่งแผนสำเร็จ!', text: 'แผนของคุณรอการอนุมัติจากผู้อำนวยการ', timer: 2000, showConfirmButton: false });
+        document.getElementById('submitPlanForm').reset();
+        loadMyPlans();
+      } else {
+        Swal.fire({ icon: 'error', title: 'ส่งแผนไม่สำเร็จ', text: res.message });
+      }
+    }
+
+    async function loadApprovedPlansForDropdown() {
+      const res = await apiCall('getApprovedPlansByTeacher', { teacherId: currentUser.userId });
+      const select = document.getElementById('postPlanSelect');
+      if (res.success && res.data.plans.length) {
+        select.innerHTML = '<option value="">-- กรุณาเลือกแผน --</option>' + res.data.plans.map(p => '<option value="' + p.planId + '">' + p.unitName + ' - ' + p.subUnitName + '</option>').join('');
+      } else {
+        select.innerHTML = '<option value="">ยังไม่มีแผนที่อนุมัติ</option>';
+      }
+    }
+
+    async function submitPostPlan(e) {
+      e.preventDefault();
+      const data = {
+        teacherId: currentUser.userId,
+        planId: document.getElementById('postPlanSelect').value,
+        postPlanUrl: document.getElementById('postPlanUrl').value
+      };
+      Swal.fire({ title: 'กำลังส่งหลังแผน...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      const res = await apiCall('submitPostPlan', data);
+      if (res.success) {
+        Swal.fire({ icon: 'success', title: 'ส่งหลังแผนสำเร็จ!', timer: 2000, showConfirmButton: false });
+        document.getElementById('submitPostPlanForm').reset();
+      } else {
+        Swal.fire({ icon: 'error', title: 'ส่งหลังแผนไม่สำเร็จ', text: res.message });
+      }
+    }
+
+    async function loadMyPlans() {
+      const res = await apiCall('getMyPlans', { teacherId: currentUser.userId });
+      const tbody = document.getElementById('myPlansTable');
+      if (res.success && res.data.plans.length) {
+        tbody.innerHTML = res.data.plans.map(p => {
+          const statusBadge = p.status === 'approved'
+            ? '<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">อนุมัติแล้ว</span>'
+            : p.status === 'rejected'
+            ? '<span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full">ส่งคืนแก้ไข</span>'
+            : '<span class="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full">รออนุมัติ</span>';
+          const actionBtn = p.status === 'rejected'
+            ? '<button onclick="openResubmitModal(\'' + p.planId + '\',\'' + (p.unitName || '').replace(/'/g, "\\'") + '\')" class="text-blue-600 hover:text-blue-800 mr-2" title="ส่งแผนใหม่"><i class="fas fa-redo"></i></button>'
+            : '';
+          return '<tr><td class="px-4 py-3 font-medium">' + p.unitName + '</td><td class="px-4 py-3">' + p.learningArea + '</td><td class="px-4 py-3 text-center">' + statusBadge + '</td><td class="px-4 py-3 text-sm text-gray-500 max-w-xs truncate">' + (p.directorComment || '-') + '</td><td class="px-4 py-3 text-center">' + actionBtn + '<a href="' + p.planUrl + '" target="_blank" class="text-blue-600 hover:text-blue-800" title="เปิดดู"><i class="fas fa-external-link-alt"></i></a></td></tr>';
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-6 text-center text-gray-400">ยังไม่มีข้อมูลแผน</td></tr>';
+      }
+    }
+
+    function openResubmitModal(planId, unitName) {
+      document.getElementById('resubmitPlanId').value = planId;
+      document.getElementById('resubmitUnitName').value = unitName;
+      document.getElementById('resubmitPlanUrl').value = '';
+      document.getElementById('resubmitModal').classList.remove('hidden');
+    }
+
+    async function submitResubmit(e) {
+      e.preventDefault();
+      const data = {
+        planId: document.getElementById('resubmitPlanId').value,
+        newUnitName: document.getElementById('resubmitUnitName').value,
+        newPlanUrl: document.getElementById('resubmitPlanUrl').value
+      };
+      Swal.fire({ title: 'กำลังส่งแผนใหม่...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      const res = await apiCall('resubmitPlan', data);
+      if (res.success) {
+        closeModal('resubmitModal');
+        Swal.fire({ icon: 'success', title: 'ส่งแผนใหม่สำเร็จ!', timer: 2000, showConfirmButton: false });
+        loadMyPlans();
+      } else {
+        Swal.fire({ icon: 'error', title: 'ส่งแผนไม่สำเร็จ', text: res.message });
+      }
+    }
+
+    function loadProfile() {
+      if (!currentUser) return;
+      document.getElementById('profPrefix').value = currentUser.prefix || 'นาย';
+      document.getElementById('profFirstname').value = currentUser.firstname || '';
+      document.getElementById('profLastname').value = currentUser.lastname || '';
+      document.getElementById('profPassword').value = '';
+      if (currentUser.profilePicUrl) {
+        const img = document.getElementById('profPicPreview');
+        img.src = currentUser.profilePicUrl;
+        img.classList.remove('hidden');
+      }
+    }
+
+    function previewProfilePic(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('profPicPreview');
+        img.src = e.target.result;
+        img.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function updateProfile(e) {
+      e.preventDefault();
+      const data = {
+        userId: currentUser.userId,
+        prefix: document.getElementById('profPrefix').value,
+        firstname: document.getElementById('profFirstname').value,
+        lastname: document.getElementById('profLastname').value
+      };
+      const pw = document.getElementById('profPassword').value;
+      if (pw) data.password = pw;
+
+      const fileInput = document.getElementById('profPic');
+      const file = fileInput.files[0];
+
+      Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        if (file) {
+          const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = function(e) { resolve(e.target.result); };
+            reader.readAsDataURL(file);
+          });
+          const picRes = await apiCall('uploadProfilePicture', { userId: currentUser.userId, base64Data: base64, fileName: file.name });
+          if (picRes.success) {
+            currentUser.profilePicUrl = picRes.data.profilePicUrl;
+            document.getElementById('userAvatar').src = picRes.data.profilePicUrl;
+          }
+        }
+
+        const res = await apiCall('updateProfile', data);
+        if (res.success) {
+          currentUser.firstname = data.firstname;
+          currentUser.lastname = data.lastname;
+          currentUser.prefix = data.prefix;
+          localStorage.setItem('kps_user', JSON.stringify(currentUser));
+          const name = (currentUser.prefix || '') + (currentUser.firstname || '') + ' ' + (currentUser.lastname || '');
+          document.getElementById('userDisplayName').textContent = name;
+          Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', timer: 1500, showConfirmButton: false });
+          fileInput.value = '';
+          document.getElementById('profPicPreview').classList.add('hidden');
+        } else {
+          Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message });
+        }
+      } catch (err) {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+      }
+    }
+
   </script>
 </body>
 </html>
